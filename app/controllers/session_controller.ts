@@ -5,11 +5,18 @@ import User from '#models/user';
 
 
 export default class SessionController {
-        async store({request}:HttpContext){
-            const {email, password} = await request.validateUsing(createSessionValidator)
-            const user = await User.verifyCredentials(email, password)
-            return User.accessTokens.create(user)
-    }
+    async store({ request }: HttpContext) {
+        const { email, password } = await request.validateUsing(createSessionValidator);
+        const user = await User.verifyCredentials(email, password);
+      
+        const token = await User.accessTokens.create(user);
+      
+        return {
+          user,
+          token,
+        };
+      }
+      
     async destroy({auth, response}: HttpContext){
         const user = auth.user!
         await User.accessTokens.delete(user, user.currentAccessToken.identifier)
